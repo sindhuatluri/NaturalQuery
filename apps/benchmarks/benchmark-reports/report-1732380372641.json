@@ -1,0 +1,82 @@
+{
+  "timestamp": "2024-11-23T16:46:12.640Z",
+  "totalCases": 3,
+  "successfulCases": 0,
+  "averageExecutionTime": 3641.6666666666665,
+  "results": [
+    {
+      "caseName": "Simple Select",
+      "success": false,
+      "generatedQuery": "SELECT \"customer_id\", \"email\"\nFROM \"public\".\"customers\"\nWHERE \"country\" = 'USA'\nLIMIT 50;",
+      "expectedQuery": "SELECT * FROM customers WHERE country = 'USA'",
+      "executionTime": 4583,
+      "matchScore": 0,
+      "generatedResults": [
+        {
+          "customer_id": 1,
+          "email": "john@example.com"
+        }
+      ],
+      "expectedResults": [
+        {
+          "customer_id": 1,
+          "name": "John Doe",
+          "email": "john@example.com",
+          "country": "USA"
+        }
+      ]
+    },
+    {
+      "caseName": "Join with Aggregation",
+      "success": false,
+      "generatedQuery": "SELECT \"customers\".name, SUM(\"orders\".total_amount) AS total_spent\nFROM \"public\".\"orders\"\nJOIN \"public\".\"customers\" ON \"orders\".customer_id = \"customers\".customer_id\nGROUP BY \"customers\".name\nLIMIT 50;",
+      "expectedQuery": "\n      SELECT c.name, COALESCE(SUM(o.total_amount), 0) as total_spent\n      FROM customers c\n      LEFT JOIN orders o ON c.customer_id = o.customer_id\n      GROUP BY c.customer_id, c.name\n      ORDER BY total_spent DESC\n    ",
+      "executionTime": 2556,
+      "matchScore": 0,
+      "generatedResults": [
+        {
+          "name": "John Doe",
+          "total_spent": "1499.98"
+        },
+        {
+          "name": "Jane Smith",
+          "total_spent": "999.98"
+        }
+      ],
+      "expectedResults": [
+        {
+          "name": "John Doe",
+          "total_spent": 1499.98
+        },
+        {
+          "name": "Jane Smith",
+          "total_spent": 999.98
+        },
+        {
+          "name": "Alice Johnson",
+          "total_spent": 0
+        }
+      ]
+    },
+    {
+      "caseName": "Complex Multi-Join",
+      "success": false,
+      "generatedQuery": "",
+      "expectedQuery": "\n      SELECT p.name as product_name, SUM(oi.quantity) as total_quantity\n      FROM customers c\n      JOIN orders o ON c.customer_id = o.customer_id\n      JOIN order_items oi ON o.order_id = oi.order_id\n      JOIN products p ON oi.product_id = p.product_id\n      WHERE c.name = 'John Doe'\n      GROUP BY p.product_id, p.name\n    ",
+      "executionTime": 3786,
+      "error": "QueryFailedError: missing FROM-clause entry for table \"products\"",
+      "matchScore": 0,
+      "generatedResults": [],
+      "expectedResults": [
+        {
+          "product_name": "Laptop Pro",
+          "total_quantity": 1
+        },
+        {
+          "product_name": "Wireless Headphones",
+          "total_quantity": 1
+        }
+      ]
+    }
+  ]
+}

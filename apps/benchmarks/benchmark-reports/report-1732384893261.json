@@ -1,0 +1,104 @@
+{
+  "timestamp": "2024-11-23T18:01:33.260Z",
+  "databaseType": "mssql",
+  "modelType": "deepseek-coder-v2:latest",
+  "totalCases": 3,
+  "successfulCases": 3,
+  "averageExecutionTime": 8158.666666666667,
+  "results": [
+    {
+      "caseName": "Simple Select",
+      "success": true,
+      "generatedQuery": "SELECT [customers].[customer_id], [customers].[name], [customers].[email], [customers].[country] \nFROM [customers] \nWHERE [customers].[country] = 'USA';",
+      "expectedQuery": "SELECT customer_id, name, email, country FROM customers WHERE country = 'USA'",
+      "executionTime": 21860,
+      "matchScore": 1,
+      "generatedResults": [
+        {
+          "customer_id": 1,
+          "name": "John Doe",
+          "email": "john@example.com",
+          "country": "USA"
+        }
+      ],
+      "expectedResults": [
+        {
+          "customer_id": 1,
+          "name": "John Doe",
+          "email": "john@example.com",
+          "country": "USA"
+        }
+      ],
+      "columnsMatch": true,
+      "dataMatch": true
+    },
+    {
+      "caseName": "Join with Aggregation",
+      "success": true,
+      "generatedQuery": "SELECT c.[name], SUM(o.[total_amount]) AS total_spent\nFROM [customers] c\nLEFT JOIN [orders] o ON c.customer_id = o.customer_id\nGROUP BY c.[name];",
+      "expectedQuery": "\n      SELECT c.name, COALESCE(SUM(o.total_amount), 0) as total_spent\n      FROM customers c\n      LEFT JOIN orders o ON c.customer_id = o.customer_id\n      GROUP BY c.name\n      ORDER BY total_spent DESC\n    ",
+      "executionTime": 969,
+      "matchScore": 1,
+      "generatedResults": [
+        {
+          "name": "Alice Johnson",
+          "total_spent": 0
+        },
+        {
+          "name": "Jane Smith",
+          "total_spent": 999.98
+        },
+        {
+          "name": "John Doe",
+          "total_spent": 1499.98
+        }
+      ],
+      "expectedResults": [
+        {
+          "name": "Alice Johnson",
+          "total_spent": 0
+        },
+        {
+          "name": "Jane Smith",
+          "total_spent": 999.98
+        },
+        {
+          "name": "John Doe",
+          "total_spent": 1499.98
+        }
+      ],
+      "columnsMatch": true,
+      "dataMatch": true
+    },
+    {
+      "caseName": "Complex Multi-Join",
+      "success": true,
+      "generatedQuery": "SELECT p.[name] AS product_name, SUM(oi.quantity) AS total_quantity\nFROM [orders] o\nLEFT JOIN [order_items] oi ON o.order_id = oi.order_id\nLEFT JOIN [products] p ON oi.product_id = p.product_id\nWHERE o.[customer_id] = (SELECT customer_id FROM customers WHERE name = 'John Doe')\nGROUP BY p.[name];",
+      "expectedQuery": "\n      SELECT p.name as product_name, SUM(oi.quantity) as total_quantity\n      FROM customers c\n      JOIN orders o ON c.customer_id = o.customer_id\n      JOIN order_items oi ON o.order_id = oi.order_id\n      JOIN products p ON oi.product_id = p.product_id\n      WHERE c.name = 'John Doe'\n      GROUP BY p.name\n      ORDER BY p.name\n    ",
+      "executionTime": 1647,
+      "matchScore": 1,
+      "generatedResults": [
+        {
+          "product_name": "Laptop Pro",
+          "total_quantity": 1
+        },
+        {
+          "product_name": "Wireless Headphones",
+          "total_quantity": 1
+        }
+      ],
+      "expectedResults": [
+        {
+          "product_name": "Laptop Pro",
+          "total_quantity": 1
+        },
+        {
+          "product_name": "Wireless Headphones",
+          "total_quantity": 1
+        }
+      ],
+      "columnsMatch": true,
+      "dataMatch": true
+    }
+  ]
+}

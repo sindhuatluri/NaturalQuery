@@ -1,0 +1,73 @@
+{
+  "timestamp": "2024-11-23T18:11:10.240Z",
+  "databaseType": "mysql",
+  "modelType": "deepseek-coder-v2:latest",
+  "totalCases": 3,
+  "successfulCases": 0,
+  "averageExecutionTime": 1911.3333333333333,
+  "results": [
+    {
+      "caseName": "Simple Select",
+      "success": false,
+      "generatedQuery": "",
+      "expectedQuery": "SELECT customer_id, name, email, country FROM customers WHERE country = 'USA'",
+      "executionTime": 2944,
+      "error": "QueryFailedError: Table 'mysql.customer' doesn't exist",
+      "matchScore": 0,
+      "generatedResults": [],
+      "expectedResults": [
+        {
+          "customer_id": 1,
+          "name": "John Doe",
+          "email": "john@example.com",
+          "country": "USA"
+        }
+      ]
+    },
+    {
+      "caseName": "Join with Aggregation",
+      "success": false,
+      "generatedQuery": "",
+      "expectedQuery": "\n      SELECT c.name, COALESCE(SUM(o.total_amount), 0) as total_spent\n      FROM customers c\n      LEFT JOIN orders o ON c.customer_id = o.customer_id\n      GROUP BY c.name\n      ORDER BY total_spent DESC\n    ",
+      "executionTime": 1046,
+      "error": "QueryFailedError: Unknown column 'c.User' in 'field list'",
+      "matchScore": 0,
+      "generatedResults": [],
+      "expectedResults": [
+        {
+          "name": "John Doe",
+          "total_spent": 1499.98
+        },
+        {
+          "name": "Jane Smith",
+          "total_spent": 999.98
+        },
+        {
+          "name": "Alice Johnson",
+          "total_spent": 0
+        }
+      ]
+    },
+    {
+      "caseName": "Complex Multi-Join",
+      "success": false,
+      "generatedQuery": "SELECT \n    `component`.`component_urn` AS product_name,\n    SUM(`columns_priv`.`Column_priv`) AS total_quantity\nFROM \n    `columns_priv`\nLEFT JOIN \n    `component` ON `columns_priv`.`Db` = `component`.`component_group_id` AND `columns_priv`.`Table_name` = `component`.`component_id`\nWHERE \n    `columns_priv`.`User` = 'John Doe'\nGROUP BY \n    `component`.`component_urn`;",
+      "expectedQuery": "\n      SELECT p.name as product_name, SUM(oi.quantity) as total_quantity\n      FROM customers c\n      JOIN orders o ON c.customer_id = o.customer_id\n      JOIN order_items oi ON o.order_id = oi.order_id\n      JOIN products p ON oi.product_id = p.product_id\n      WHERE c.name = 'John Doe'\n      GROUP BY p.name\n      ORDER BY p.name\n    ",
+      "executionTime": 1744,
+      "matchScore": 0,
+      "generatedResults": [],
+      "expectedResults": [
+        {
+          "product_name": "Laptop Pro",
+          "total_quantity": 1
+        },
+        {
+          "product_name": "Wireless Headphones",
+          "total_quantity": 1
+        }
+      ],
+      "columnsMatch": false,
+      "dataMatch": false
+    }
+  ]
+}

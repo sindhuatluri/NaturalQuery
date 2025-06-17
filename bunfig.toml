@@ -1,0 +1,33 @@
+[install]
+# Automatically install peer dependencies
+peer = true
+
+# Registry to use
+registry = "https://registry.npmjs.org"
+
+[install.cache]
+# Enable global cache
+dir = "~/.bun/install/cache"
+enabled = true
+
+[workspaces]
+# Define your workspace paths
+paths = ["apps/*"]
+
+[debug]
+# Enable source maps for debugging
+sourcemap = true
+
+[test]
+# Configure test environment
+coverage = true
+# Specify test file patterns
+testMatch = ["**/*.test.ts", "**/*.spec.ts"]
+
+[install.lockfile]
+# Enable lockfile
+enabled = true
+
+[install.trusted-dependencies]
+# List trusted dependencies that may require native addons
+names = ["canvas", "esbuild", "msgpackr-extract", "sharp"]

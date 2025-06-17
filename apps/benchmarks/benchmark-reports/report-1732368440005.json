@@ -1,0 +1,36 @@
+{
+  "timestamp": "2024-11-23T13:27:20.005Z",
+  "totalCases": 3,
+  "successfulCases": 0,
+  "averageMatchScore": 0,
+  "averageExecutionTime": 5.333333333333333,
+  "results": [
+    {
+      "caseName": "Simple Select",
+      "success": false,
+      "generatedQuery": "",
+      "expectedQuery": "SELECT * FROM customers WHERE country = 'USA'",
+      "executionTime": 14,
+      "error": "ResponseError: model \"llama-3.2-3b-instruct\" not found, try pulling it first",
+      "matchScore": 0
+    },
+    {
+      "caseName": "Join with Aggregation",
+      "success": false,
+      "generatedQuery": "",
+      "expectedQuery": "\n      SELECT c.name, COALESCE(SUM(o.total_amount), 0) as total_spent\n      FROM customers c\n      LEFT JOIN orders o ON c.customer_id = o.customer_id\n      GROUP BY c.customer_id, c.name\n      ORDER BY total_spent DESC\n    ",
+      "executionTime": 1,
+      "error": "ResponseError: model \"llama-3.2-3b-instruct\" not found, try pulling it first",
+      "matchScore": 0
+    },
+    {
+      "caseName": "Complex Multi-Join",
+      "success": false,
+      "generatedQuery": "",
+      "expectedQuery": "\n      SELECT p.name as product_name, SUM(oi.quantity) as total_quantity\n      FROM customers c\n      JOIN orders o ON c.customer_id = o.customer_id\n      JOIN order_items oi ON o.order_id = oi.order_id\n      JOIN products p ON oi.product_id = p.product_id\n      WHERE c.name = 'John Doe'\n      GROUP BY p.product_id, p.name\n    ",
+      "executionTime": 1,
+      "error": "ResponseError: model \"llama-3.2-3b-instruct\" not found, try pulling it first",
+      "matchScore": 0
+    }
+  ]
+}

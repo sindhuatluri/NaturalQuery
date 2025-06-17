@@ -1,0 +1,34 @@
+{
+  "timestamp": "2024-11-23T13:34:31.556Z",
+  "totalCases": 3,
+  "successfulCases": 0,
+  "averageMatchScore": 0.11177136389360498,
+  "averageExecutionTime": 2861,
+  "results": [
+    {
+      "caseName": "Simple Select",
+      "success": false,
+      "generatedQuery": "explanation: We want to retrieve a list of customers who are located in the USA, which is stored in the \"country\" column of the \"customers\" table.\n\nquery: \nSELECT \"customer_id\", \"name\", \"email\"\nFROM \"public\".\"customers\"\nWHERE \"country\" = 'USA'\nLIMIT 50;\n\nvisualization: table",
+      "expectedQuery": "SELECT * FROM customers WHERE country = 'USA'",
+      "executionTime": 2351,
+      "matchScore": 0.15789473684210525
+    },
+    {
+      "caseName": "Join with Aggregation",
+      "success": false,
+      "generatedQuery": "explanation: We want to retrieve the total amount spent by each customer and their corresponding name from the \"orders\" table. To get this information, we need to join the \"customers\" table with the \"orders\" table on the \"customer_id\" column.\n\nquery: \n```sql\nSELECT \n  \"public\".\"customers\".name,\n  SUM(\"public\".\"orders\".total_amount) AS total_spent\nFROM \n  \"public\".\"orders\"\n  JOIN \"public\".\"customers\" ON \"public\".\"orders\".customer_id = \"public\".\"customers\".customer_id\nGROUP BY \n  \"public\".\"customers\".name\nORDER BY \n  total_spent DESC\nLIMIT 50;\n```\n\nvisualization: table",
+      "expectedQuery": "\n      SELECT c.name, COALESCE(SUM(o.total_amount), 0) as total_spent\n      FROM customers c\n      LEFT JOIN orders o ON c.customer_id = o.customer_id\n      GROUP BY c.customer_id, c.name\n      ORDER BY total_spent DESC\n    ",
+      "executionTime": 3194,
+      "matchScore": 0.1774193548387097
+    },
+    {
+      "caseName": "Complex Multi-Join",
+      "success": false,
+      "generatedQuery": "",
+      "expectedQuery": "\n      SELECT p.name as product_name, SUM(oi.quantity) as total_quantity\n      FROM customers c\n      JOIN orders o ON c.customer_id = o.customer_id\n      JOIN order_items oi ON o.order_id = oi.order_id\n      JOIN products p ON oi.product_id = p.product_id\n      WHERE c.name = 'John Doe'\n      GROUP BY p.product_id, p.name\n    ",
+      "executionTime": 3038,
+      "error": "QueryFailedError: missing FROM-clause entry for table \"products\"",
+      "matchScore": 0
+    }
+  ]
+}

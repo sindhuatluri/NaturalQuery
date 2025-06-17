@@ -1,0 +1,72 @@
+{
+  "timestamp": "2024-11-23T19:46:24.838Z",
+  "databaseType": "postgres",
+  "modelType": "deepseek-coder-v2:latest",
+  "totalCases": 3,
+  "successfulCases": 0,
+  "averageExecutionTime": 1706.6666666666667,
+  "results": [
+    {
+      "caseName": "Simple Select",
+      "success": false,
+      "generatedQuery": "",
+      "expectedQuery": "SELECT customer_id, name, email, country FROM customers WHERE country = 'USA'",
+      "executionTime": 3179,
+      "error": "QueryFailedError: relation \"addresses\" does not exist",
+      "matchScore": 0,
+      "generatedResults": [],
+      "expectedResults": [
+        {
+          "customer_id": 1,
+          "name": "John Doe",
+          "email": "john@example.com",
+          "country": "USA"
+        }
+      ]
+    },
+    {
+      "caseName": "Join with Aggregation",
+      "success": false,
+      "generatedQuery": "",
+      "expectedQuery": "\n      SELECT c.name, COALESCE(SUM(o.total_amount), 0) as total_spent\n      FROM customers c\n      LEFT JOIN orders o ON c.customer_id = o.customer_id\n      GROUP BY c.name\n      ORDER BY total_spent DESC\n    ",
+      "executionTime": 829,
+      "error": "QueryFailedError: column c.id does not exist",
+      "matchScore": 0,
+      "generatedResults": [],
+      "expectedResults": [
+        {
+          "name": "John Doe",
+          "total_spent": 1499.98
+        },
+        {
+          "name": "Jane Smith",
+          "total_spent": 999.98
+        },
+        {
+          "name": "Alice Johnson",
+          "total_spent": 0
+        }
+      ]
+    },
+    {
+      "caseName": "Complex Multi-Join",
+      "success": false,
+      "generatedQuery": "",
+      "expectedQuery": "\n      SELECT p.name as product_name, SUM(oi.quantity) as total_quantity\n      FROM customers c\n      JOIN orders o ON c.customer_id = o.customer_id\n      JOIN order_items oi ON o.order_id = oi.order_id\n      JOIN products p ON oi.product_id = p.product_id\n      WHERE c.name = 'John Doe'\n      GROUP BY p.name\n      ORDER BY p.name\n    ",
+      "executionTime": 1112,
+      "error": "QueryFailedError: column c.id does not exist",
+      "matchScore": 0,
+      "generatedResults": [],
+      "expectedResults": [
+        {
+          "product_name": "Laptop Pro",
+          "total_quantity": 1
+        },
+        {
+          "product_name": "Wireless Headphones",
+          "total_quantity": 1
+        }
+      ]
+    }
+  ]
+}
